@@ -1,0 +1,36 @@
+<projectSpec>
+  <project
+        name="8_TouchDigitLogger"
+        device="TMS320F28P550SJ9"
+        cgtVersion="25.11.1.LTS"
+        products="C2000WARE"
+        outputFormat="ELF"
+        launchWizard="False"
+        linkerCommandFile=""
+        >
+    <!--
+      TTP229 4x4 터치 키패드에 손가락으로 쓴 숫자를 글자 단위로 잘라 Edge AI Studio 분류 학습용 특징(32칸 x 3열: x, y, pen)으로 기록합니다.
+      - 배선: 모듈 SCL <- B Side 23번 핀(GPIO8), 모듈 SDO -> B Side 25번 핀(GPIO4, XINT1) (DOCK 보드는 우측 CN4200 23·25번), VCC 3.3V, GND
+      - 모듈 점퍼: TP2(16키), TP3+TP4(멀티키), TP5(권장)
+      - CCS Scripting Console(collect_touch.js)로 "숫자 N을 쓰세요" 안내와 CSV 저장
+      기본 구성은 CPU1_RAM, CPU1_FLASH도 선택 가능합니다.
+    -->
+    <configuration name="CPU1_RAM"
+        compilerBuildOptions="--opt_level=off -I${PROJECT_ROOT} -I${PROJECT_ROOT}/device -I${PROJECT_ROOT}/device/driverlib -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --fp_mode=relaxed --define=DEBUG --define=CPU1 --gen_func_subsections --diag_warning=225 --diag_suppress=10063"
+        linkerBuildOptions="--entry_point code_start --stack_size=0x400 --heap_size=0x400 -i${PROJECT_ROOT} -i${CG_TOOL_ROOT}/lib driverlib.lib -l rts2800_fpu32_eabi.lib" />
+    <configuration name="CPU1_FLASH"
+        compilerBuildOptions="--opt_level=off -I${PROJECT_ROOT} -I${PROJECT_ROOT}/device -I${PROJECT_ROOT}/device/driverlib -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --fp_mode=relaxed --define=DEBUG --define=CPU1 --define=_FLASH --gen_func_subsections --diag_warning=225 --diag_suppress=10063"
+        linkerBuildOptions="--entry_point code_start --stack_size=0x400 --heap_size=0x400 --define=_FLASH -i${PROJECT_ROOT} -i${CG_TOOL_ROOT}/lib driverlib.lib -l rts2800_fpu32_eabi.lib" />
+
+    <file action="copy" path="../driverlib.lib" targetDirectory="" applicableConfigurations="CPU1_RAM, CPU1_FLASH" />
+    <file action="copy" path="../device" targetDirectory="" />
+    <file action="copy" path="../28p55x_generic_ram_lnk.cmd" targetDirectory="" applicableConfigurations="CPU1_RAM" />
+    <file action="copy" path="../28p55x_generic_flash_lnk.cmd" targetDirectory="" applicableConfigurations="CPU1_FLASH" />
+    <file action="copy" path="../targetConfigs/TMS320F28P550SJ9.ccxml" targetDirectory="targetConfigs" />
+    <file action="copy" path="../targetConfigs/TMS320F28P559SJ9-Q1_DOCK_XDS100v2.ccxml" targetDirectory="targetConfigs" />
+    <file action="copy" path="../8_TouchDigitLogger.c" targetDirectory="" />
+    <file action="copy" path="../collect_touch.js" targetDirectory="" />
+    <file action="copy" path="../watch_var.json" targetDirectory="" />
+    <file action="copy" path="../README.md" targetDirectory="" />
+  </project>
+</projectSpec>

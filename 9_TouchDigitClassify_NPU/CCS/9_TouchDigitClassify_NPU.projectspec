@@ -1,0 +1,40 @@
+<projectSpec>
+  <project
+        name="9_TouchDigitClassify_NPU"
+        device="TMS320F28P550SJ9"
+        cgtVersion="25.11.1.LTS"
+        products="C2000WARE"
+        outputFormat="ELF"
+        launchWizard="False"
+        linkerCommandFile=""
+        >
+    <!--
+      8_TouchDigitLogger로 모은 데이터로 학습한 분류 모델(Simple Window, Variables 3, Frame 32, 하드웨어 NPU)로
+      TTP229 4x4 터치 키패드에 손가락으로 쓴 숫자(0~9)를 글자마다 판정합니다.
+      - 배선: 모듈 SCL <- B Side 23번 핀(GPIO8), 모듈 SDO -> B Side 25번 핀(GPIO4, XINT1) (DOCK 보드는 우측 CN4200 23·25번), VCC 3.3V, GND
+      - 들어 있는 model/은 합성 데이터로 학습한 임시 모델(CLS_2k_NPU). 실제 데이터로 다시 학습해 바꾸세요.
+      파일 출처:
+        7_1_TempLoadClassify_NPU : device/(f28p55x_npu.c 포함), driverlib.lib, lnk_*.cmd, targetConfigs/
+        Edge AI Studio(또는 edgeai_build.py) : model/ 4개 파일
+      구성: CPU1_RAM(기본, lnk_ram.cmd) / CPU1_FLASH(선택, lnk_flash.cmd)
+    -->
+    <configuration name="CPU1_RAM"
+        compilerBuildOptions="--opt_level=off -I${PROJECT_ROOT} -I${PROJECT_ROOT}/device -I${PROJECT_ROOT}/device/driverlib -I${PROJECT_ROOT}/model -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --fp_mode=relaxed --define=DEBUG --define=CPU1 --gen_func_subsections --diag_warning=225 --diag_suppress=10063"
+        linkerBuildOptions="--entry_point code_start --stack_size=0x400 --heap_size=0x400 -i${PROJECT_ROOT} -i${CG_TOOL_ROOT}/lib model/mod.a driverlib.lib -l rts2800_fpu32_eabi.lib" />
+    <configuration name="CPU1_FLASH"
+        compilerBuildOptions="--opt_level=off -I${PROJECT_ROOT} -I${PROJECT_ROOT}/device -I${PROJECT_ROOT}/device/driverlib -I${PROJECT_ROOT}/model -v28 -ml -mt --float_support=fpu32 --tmu_support=tmu0 --fp_mode=relaxed --define=DEBUG --define=CPU1 --define=_FLASH --gen_func_subsections --diag_warning=225 --diag_suppress=10063"
+        linkerBuildOptions="--entry_point code_start --stack_size=0x400 --heap_size=0x400 --define=_FLASH -i${PROJECT_ROOT} -i${CG_TOOL_ROOT}/lib model/mod.a driverlib.lib -l rts2800_fpu32_eabi.lib" />
+
+    <file action="copy" path="../driverlib.lib" targetDirectory="" />
+    <file action="copy" path="../device" targetDirectory="" />
+    <file action="copy" path="../model" targetDirectory="" />
+    <file action="copy" path="../lnk_ram.cmd" targetDirectory="" applicableConfigurations="CPU1_RAM" />
+    <file action="copy" path="../lnk_flash.cmd" targetDirectory="" applicableConfigurations="CPU1_FLASH" />
+    <file action="copy" path="../targetConfigs/TMS320F28P550SJ9.ccxml" targetDirectory="targetConfigs" />
+    <file action="copy" path="../targetConfigs/TMS320F28P559SJ9-Q1_DOCK_XDS100v2.ccxml" targetDirectory="targetConfigs" />
+    <file action="copy" path="../9_TouchDigitClassify_NPU.c" targetDirectory="" />
+    <file action="copy" path="../test_touch.js" targetDirectory="" />
+    <file action="copy" path="../watch_var.json" targetDirectory="" />
+    <file action="copy" path="../README.md" targetDirectory="" />
+  </project>
+</projectSpec>
